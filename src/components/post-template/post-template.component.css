@@ -53,15 +53,16 @@
   position: relative;
   object-position: center top;
   z-index: 0;
-  mask-image: linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%);
+  mask-image: linear-gradient(to top, transparent 0%, #012148 20%);
 }
 
 .athlete-name {
   margin: 0;
   padding: 0;
   color: #ffffff;
-  font-size: 20px;
+  background-color: #012148;
+  padding: 5px;
+  font-size: 18px;
   font-weight: 600;
   text-align: center;
   font-family: 'Cunia', Arial, sans-serif;

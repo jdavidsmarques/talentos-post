@@ -22,6 +22,7 @@ export class AppComponent {
   selectedAthleteIds: string[] = [];
   isGenerating = false;
   showFullPreview = false;
+  showPreviewSidebar = false;
 
   formData: PostData = {
     dateLocation: '16 NOV - PENELA, PORTUGAL',
@@ -106,6 +107,14 @@ export class AppComponent {
 
   closeFullPreview(): void {
     this.showFullPreview = false;
+  }
+
+  togglePreviewSidebar(): void {
+    this.showPreviewSidebar = !this.showPreviewSidebar;
+  }
+
+  closePreviewSidebar(): void {
+    this.showPreviewSidebar = false;
   }
 }
 

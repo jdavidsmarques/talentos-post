@@ -39,17 +39,17 @@ export const ATHLETES: Athlete[] = [
   {
     id: '8',
     name: 'Amilcar Ramos',
-    photo: 'assets/athletes/amilcar-ramos.png'
+    photo: 'assets/athletes/tania-fernandes.png'
   },
   {
     id: '9',
     name: 'Fred Gaspar',
-    photo: 'assets/athletes/fred-gaspar.png'
+    photo: 'assets/athletes/tania-fernandes.png'
   },
   {
     id: '10',
     name: 'David Marques',
-    photo: 'assets/athletes/david-marques.png'
+    photo: 'assets/athletes/tania-fernandes.png'
   },
   {
     id: '11',

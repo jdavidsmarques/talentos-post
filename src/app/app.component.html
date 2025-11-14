@@ -1,6 +1,17 @@
 <div class="container">
   <h1>Social media post - Talentos Objetivos</h1>
 
+  <!-- Preview Sidebar Toggle Button (visible only on mobile) -->
+  <button 
+    class="preview-sidebar-toggle"
+    (click)="togglePreviewSidebar()"
+    [class.active]="showPreviewSidebar"
+    title="Toggle Preview"
+  >
+    <span *ngIf="!showPreviewSidebar">👁️</span>
+    <span *ngIf="showPreviewSidebar">✕</span>
+  </button>
+
   <div class="main-layout">
     <div class="form-column">
       <div class="form-section">
@@ -42,7 +53,7 @@
       </div>
     </div>
 
-    <div class="preview-column">
+    <div class="preview-column" [class.sidebar-open]="showPreviewSidebar">
       <div class="preview-section">
         <div class="preview-header">
           <h2>Preview</h2>
@@ -67,14 +78,22 @@
           <div #postTemplate>
             <app-post-template 
               [data]="previewData"
-              [style.transform]="'scale(0.5)'"
+              [style.transform]="showPreviewSidebar ? 'scale(1)' : 'scale(0.5)'"
               [style.transform-origin]="'top center'"
+              [style.width]="showPreviewSidebar ? '100%' : '1080px'"
             ></app-post-template>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Sidebar Overlay (for mobile) -->
+  <div 
+    class="sidebar-overlay" 
+    *ngIf="showPreviewSidebar" 
+    (click)="closePreviewSidebar()"
+  ></div>
 
   <!-- Full Preview Overlay -->
   <div class="full-preview-overlay" *ngIf="showFullPreview" (click)="closeFullPreview()">
