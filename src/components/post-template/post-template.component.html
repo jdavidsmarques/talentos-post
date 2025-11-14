@@ -1,0 +1,20 @@
+<div class="post-container" id="post-template">
+  <img src="assets/background.png" alt="Background" class="background-image" />
+  
+  <div class="athletes-grid" [attr.data-count]="data.athletes.length">
+    <div 
+      *ngFor="let athlete of data.athletes; let i = index"
+      class="athlete-card"
+      [style.grid-column]="getGridColumn(i)"
+      [style.grid-row]="getGridRow(i)"
+    >
+      <img [src]="athlete.photo" [alt]="athlete.name" class="athlete-photo" />
+      <p class="athlete-name">{{ athlete.name }}</p>
+    </div>
+  </div>
+
+  <div class="distance">{{ data.distance }}</div>
+  <div class="race-name">{{ data.raceName.toUpperCase() }}</div>
+  <div class="date-location">{{ data.dateLocation.toUpperCase() }}</div>
+</div>
+

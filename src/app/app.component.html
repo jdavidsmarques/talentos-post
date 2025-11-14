@@ -1,0 +1,65 @@
+<div class="container">
+  <h1>Social media post - Talentos Objetivos</h1>
+
+  <div class="main-layout">
+    <div class="form-column">
+      <div class="form-section">
+        <h2>Race Information</h2>
+        <div class="form-grid">
+          <div>
+            <label>Distance:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.distance"
+              placeholder="20K"
+            />
+          </div>
+          <div>
+            <label>Race Name:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.raceName"
+              placeholder="TRAIL DA PEDRA FERIDA"
+            />
+          </div>
+          <div>
+            <label>Date & Location:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.dateLocation"
+              placeholder="16 NOV - PENELA, PORTUGAL"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <app-athlete-selector
+          [athletes]="athletes"
+          [selectedAthletes]="selectedAthleteIds"
+          (toggleAthlete)="onToggleAthlete($event)"
+        ></app-athlete-selector>
+      </div>
+
+      <div class="actions">
+        <button
+          (click)="onDownload()"
+          [disabled]="!canDownload()"
+          class="download-btn"
+        >
+          {{ isGenerating ? 'Generating...' : 'Download Image' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-column">
+      <div class="preview-section">
+        <h2>Preview</h2>
+        <div class="preview-container">
+          <app-post-template [data]="previewData"></app-post-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
