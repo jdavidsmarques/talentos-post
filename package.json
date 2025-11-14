@@ -29,6 +29,7 @@
     "@angular/compiler-cli": "^17.0.0",
     "@types/html2canvas": "^1.0.0",
     "@types/node": "^20.0.0",
+    "angular-cli-ghpages": "^2.0.3",
     "typescript": "~5.2.0"
   }
 }
