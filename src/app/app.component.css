@@ -26,14 +26,12 @@ h1 {
 .preview-column {
   position: sticky;
   top: 20px;
-  flex: 1;
 }
 
 .form-section {
   background: #f5f5f5;
   padding: 20px;
   border-radius: 8px;
-  margin-bottom: 20px;
 }
 
 .form-section h2 {
@@ -54,19 +52,21 @@ h1 {
   color: #333;
 }
 
-.form-grid input {
+.form-grid input,
+.form-grid textarea {
   width: 100%;
-  padding: 10px;
+  padding: 6px 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  font-family: inherit;
+  height: auto;
 }
 
-.actions {
-  display: flex;
-  gap: 15px;
-  justify-content: flex-start;
-  margin-top: 10px;
+.form-grid textarea {
+  resize: none;
+  min-height: 40px;
+  line-height: 1.4;
 }
 
 .generate-btn,
@@ -97,10 +97,17 @@ h1 {
 .download-btn {
   background: #4caf50;
   color: white;
+  padding: 10px 20px;
+  font-size: 14px;
 }
 
-.download-btn:hover {
+.download-btn:hover:not(:disabled) {
   background: #45a049;
+}
+
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .preview-section {
@@ -109,31 +116,119 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   min-height: 600px;
+  width: 580px;
 }
 
-.preview-section h2 {
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.preview-header h2 {
+  margin: 0;
   color: #0a1a2e;
+}
+
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.full-preview-btn {
+  background: #0a1a2e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.full-preview-btn:hover {
+  background: #1a2a3e;
 }
 
 .preview-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  overflow: visible;
-  padding: 20px;
-  min-height: 500px;
   width: 100%;
   max-width: 540px;
+  max-height: 540px;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 
 .preview-container app-post-template {
   display: block !important;
-  transform-origin: top center;
   width: 1080px;
   height: 1080px;
-  transform: scale(0.5);
+  transition: transform 0.2s ease;
+}
+
+.full-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1000;
+  padding: 20px;
+  overflow: auto;
+}
+
+.full-preview-content {
+  position: relative;
+  width: 1080px;
+  height: 1080px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  min-width: 1080px;
+  min-height: 1080px;
+}
+
+.full-preview-content .full-preview-template {
+  display: block !important;
+  width: 1080px;
+  height: 1080px;
+}
+
+.close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 1001;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 @media (max-width: 1200px) {
@@ -145,9 +240,14 @@ h1 {
     position: static;
   }
 
-  .preview-container app-post-template {
-    transform: scale(0.3);
-    margin: -378px 0;
+  .preview-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .preview-controls {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

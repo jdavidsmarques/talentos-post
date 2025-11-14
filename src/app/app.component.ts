@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ImageGeneratorService } from '../services/image-generator.service';
@@ -16,14 +16,17 @@ import { PostTemplateComponent } from '../components/post-template/post-template
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  athletes: Athlete[] = ATHLETES;
+  @ViewChild('postTemplate', { static: false }) postTemplate!: ElementRef<HTMLElement>;
+  
+  athletes: Athlete[] = [...ATHLETES].sort((a, b) => a.name.localeCompare(b.name));
   selectedAthleteIds: string[] = [];
   isGenerating = false;
+  showFullPreview = false;
 
   formData: PostData = {
     dateLocation: '16 NOV - PENELA, PORTUGAL',
-    raceName: 'TRAIL DA PEDRA FERIDA',
-    distance: '20K',
+    raceName: 'TRAIL\nPEDRA DA FERIDA',
+    distance: '20K\nCURTO',
     athletes: []
   };
 
@@ -32,7 +35,8 @@ export class AppComponent {
   get previewData(): PostData {
     const selectedAthletes = this.athletes
       .filter(a => this.selectedAthleteIds.includes(a.id))
-      .map(a => ({ id: a.id, name: a.name, photo: a.photo }));
+      .map(a => ({ id: a.id, name: a.name, photo: a.photo }))
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       ...this.formData,
@@ -53,7 +57,32 @@ export class AppComponent {
 
     this.isGenerating = true;
     try {
-      const imageDataUrl = await this.imageGeneratorService.generatePostImage(this.previewData);
+      // Use the actual preview element to generate the image
+      const previewWrapper = this.postTemplate?.nativeElement;
+      const previewElement = previewWrapper?.querySelector('#post-template') as HTMLElement;
+      const templateElement = previewWrapper?.querySelector('app-post-template') as HTMLElement;
+      
+      if (!previewElement) {
+        throw new Error('Preview element not found');
+      }
+
+      // Store original transform
+      const originalTransform = templateElement?.style.transform || '';
+      
+      // Remove scale transform temporarily for image generation (preview is scaled to 0.5)
+      if (templateElement) {
+        templateElement.style.transform = 'scale(1)';
+      }
+
+      // Wait a bit for the transform to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const imageDataUrl = await this.imageGeneratorService.generatePostImageFromElement(previewElement);
+
+      // Restore original transform
+      if (templateElement) {
+        templateElement.style.transform = originalTransform;
+      }
 
       const link = document.createElement('a');
       link.download = `post-${this.formData.raceName.toLowerCase().replace(/\s+/g, '-')}.png`;
@@ -69,6 +98,14 @@ export class AppComponent {
 
   canDownload(): boolean {
     return !this.isGenerating && this.selectedAthleteIds.length > 0;
+  }
+
+  openFullPreview(): void {
+    this.showFullPreview = true;
+  }
+
+  closeFullPreview(): void {
+    this.showFullPreview = false;
   }
 }
 

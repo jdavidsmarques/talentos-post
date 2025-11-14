@@ -8,19 +8,19 @@
         <div class="form-grid">
           <div>
             <label>Distance:</label>
-            <input
-              type="text"
+            <textarea
               [(ngModel)]="formData.distance"
               placeholder="20K"
-            />
+              rows="2"
+            ></textarea>
           </div>
           <div>
             <label>Race Name:</label>
-            <input
-              type="text"
+            <textarea
               [(ngModel)]="formData.raceName"
               placeholder="TRAIL DA PEDRA FERIDA"
-            />
+              rows="2"
+            ></textarea>
           </div>
           <div>
             <label>Date & Location:</label>
@@ -40,25 +40,50 @@
           (toggleAthlete)="onToggleAthlete($event)"
         ></app-athlete-selector>
       </div>
-
-      <div class="actions">
-        <button
-          (click)="onDownload()"
-          [disabled]="!canDownload()"
-          class="download-btn"
-        >
-          {{ isGenerating ? 'Generating...' : 'Download Image' }}
-        </button>
-      </div>
     </div>
 
     <div class="preview-column">
       <div class="preview-section">
-        <h2>Preview</h2>
+        <div class="preview-header">
+          <h2>Preview</h2>
+          <div class="preview-controls">
+            <button
+              (click)="openFullPreview()"
+              class="full-preview-btn"
+              title="View Full Size"
+            >
+              Full Size
+            </button>
+            <button
+              (click)="onDownload()"
+              [disabled]="!canDownload()"
+              class="download-btn"
+            >
+              {{ isGenerating ? 'Generating...' : 'Download' }}
+            </button>
+          </div>
+        </div>
         <div class="preview-container">
-          <app-post-template [data]="previewData"></app-post-template>
+          <div #postTemplate>
+            <app-post-template 
+              [data]="previewData"
+              [style.transform]="'scale(0.5)'"
+              [style.transform-origin]="'top center'"
+            ></app-post-template>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Full Preview Overlay -->
+  <div class="full-preview-overlay" *ngIf="showFullPreview" (click)="closeFullPreview()">
+    <div class="full-preview-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeFullPreview()" title="Close">×</button>
+      <app-post-template 
+        [data]="previewData"
+        class="full-preview-template"
+      ></app-post-template>
     </div>
   </div>
 </div>

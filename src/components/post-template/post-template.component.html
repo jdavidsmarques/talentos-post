@@ -13,8 +13,19 @@
     </div>
   </div>
 
-  <div class="distance">{{ data.distance }}</div>
-  <div class="race-name">{{ data.raceName.toUpperCase() }}</div>
-  <div class="date-location">{{ data.dateLocation.toUpperCase() }}</div>
+  <div class="race-info-container">
+    <div class="distance">
+      <span *ngIf="getDistanceLines().length === 1" class="distance-line-1">{{ getDistanceLines()[0] }}</span>
+      <ng-container *ngIf="getDistanceLines().length >= 2">
+        <span class="distance-line-1">{{ getDistanceLines()[0] }}</span>
+        <br>
+        <span class="distance-line-2">{{ getDistanceLines()[1] }}</span>
+      </ng-container>
+    </div>
+    <div class="race-info-text">
+      <div class="race-name">{{ data.raceName.toUpperCase() }}</div>
+      <div class="date-location">{{ data.dateLocation.toUpperCase() }}</div>      
+    </div>
+  </div>
 </div>
 

@@ -9,6 +9,36 @@ let html2canvas: any;
 })
 export class ImageGeneratorService {
 
+  async generatePostImageFromElement(element: HTMLElement): Promise<string> {
+    // Load html2canvas dynamically
+    if (!html2canvas) {
+      html2canvas = (await import('html2canvas')).default;
+    }
+
+    try {
+      // Wait for images to load
+      await this.waitForImages(element);
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Generate image using html2canvas from the actual preview element
+      const canvas = await html2canvas(element, {
+        width: 1080,
+        height: 1080,
+        scale: 1,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        backgroundColor: null,
+        windowWidth: 1080,
+        windowHeight: 1080
+      });
+
+      return canvas.toDataURL('image/png');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async generatePostImage(data: PostData): Promise<string> {
     // Load html2canvas dynamically
     if (!html2canvas) {
@@ -58,6 +88,19 @@ export class ImageGeneratorService {
       card.style.overflow = 'hidden';
       card.style.width = '220px';
       card.style.height = '240px';
+      card.style.position = 'relative';
+      
+      // Add gradient overlay
+      const gradientOverlay = document.createElement('div');
+      gradientOverlay.style.position = 'absolute';
+      gradientOverlay.style.top = '0';
+      gradientOverlay.style.left = '0';
+      gradientOverlay.style.width = '100%';
+      gradientOverlay.style.height = '100%';
+      gradientOverlay.style.background = 'linear-gradient(to bottom, #325052 0%, transparent 100%)';
+      gradientOverlay.style.pointerEvents = 'none';
+      gradientOverlay.style.zIndex = '1';
+      card.appendChild(gradientOverlay);
 
       // Special handling for 5 athletes: center the 2 athletes in the second row
       // Place them in columns 1 and 2 (of 3 columns) - use transform to center them
@@ -78,7 +121,11 @@ export class ImageGeneratorService {
       photo.style.width = '100%';
       photo.style.height = '180px';
       photo.style.objectFit = 'cover';
-      card.appendChild(photo);
+      photo.style.position = 'relative';
+      photo.style.zIndex = '0';
+      photo.style.maskImage = 'linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%)';
+      photo.style.webkitMaskImage = 'linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%)';
+      card.insertBefore(photo, gradientOverlay);
 
       const name = document.createElement('p');
       name.textContent = athlete.name;
@@ -88,7 +135,9 @@ export class ImageGeneratorService {
       name.style.fontSize = '18px';
       name.style.fontWeight = 'bold';
       name.style.textAlign = 'center';
-      name.style.fontFamily = 'Arial, sans-serif';
+      name.style.fontFamily = 'Cunia, Arial, sans-serif';
+      name.style.position = 'relative';
+      name.style.zIndex = '2';
       card.appendChild(name);
 
       grid.appendChild(card);
@@ -96,44 +145,83 @@ export class ImageGeneratorService {
 
     container.appendChild(grid);
 
-    // Add distance
+    // Create race info container
+    const raceInfoContainer = document.createElement('div');
+    raceInfoContainer.style.position = 'absolute';
+    raceInfoContainer.style.bottom = '50px';
+    raceInfoContainer.style.left = '60px';
+    raceInfoContainer.style.right = '60px';
+    raceInfoContainer.style.display = 'flex';
+    raceInfoContainer.style.alignItems = 'flex-end';
+    raceInfoContainer.style.justifyContent = 'space-between';
+    raceInfoContainer.style.gap = '30px';
+    raceInfoContainer.style.zIndex = '2';
+
+    // Add distance with support for two lines
     const distance = document.createElement('div');
-    distance.textContent = data.distance;
-    distance.style.position = 'absolute';
-    distance.style.bottom = '70px';
-    distance.style.left = '70px';
-    distance.style.color = '#ffffff';
-    distance.style.fontSize = '80px';
+    distance.style.color = 'transparent';
     distance.style.fontWeight = 'bold';
     distance.style.fontFamily = 'Arial, sans-serif';
-    distance.style.zIndex = '2';
-    container.appendChild(distance);
+    distance.style.fontStyle = 'italic';
+    distance.style.whiteSpace = 'pre-line';
+    distance.style.flexShrink = '0';
+    distance.style.lineHeight = '1.2';
+    
+    const distanceLines = data.distance.split('\n');
+    if (distanceLines.length === 1) {
+      // Single line
+      distance.style.webkitTextStroke = '3px #EEFC5E';
+      distance.style.fontSize = '100px';
+      distance.textContent = distanceLines[0];
+    } else if (distanceLines.length >= 2) {
+      // Two lines - first line full size, second line half size
+      const line1 = document.createElement('div');
+      line1.textContent = distanceLines[0];
+      line1.style.webkitTextStroke = '3px #EEFC5E';
+      line1.style.fontSize = '100px';
+      line1.style.display = 'block';
+      distance.appendChild(line1);
+      
+      const line2 = document.createElement('div');
+      line2.textContent = distanceLines[1];
+      line2.style.webkitTextStroke = '1.5px #EEFC5E';
+      line2.style.fontSize = '50px';
+      line2.style.display = 'block';
+      distance.appendChild(line2);
+    }
+    
+    raceInfoContainer.appendChild(distance);
 
     // Add race name
     const raceName = document.createElement('div');
     raceName.textContent = data.raceName.toUpperCase();
-    raceName.style.position = 'absolute';
-    raceName.style.bottom = '110px';
-    raceName.style.left = '280px';
-    raceName.style.color = '#ffffff';
+    raceName.style.color = '#EEFC5E';
     raceName.style.fontSize = '50px';
     raceName.style.fontWeight = 'bold';
     raceName.style.fontFamily = 'Arial, sans-serif';
-    raceName.style.zIndex = '2';
-    container.appendChild(raceName);
+    raceName.style.whiteSpace = 'pre-line';
+    raceName.style.lineHeight = '1.2';
+    raceName.style.wordWrap = 'break-word';
+    raceName.style.textAlign = 'left';
+    raceName.style.fontStyle = 'italic';
+    raceName.style.flex = '1';
+    raceName.style.minWidth = '0';
+    raceName.style.maxWidth = '700px';
+    raceInfoContainer.appendChild(raceName);
 
     // Add date location
     const dateLocation = document.createElement('div');
     dateLocation.textContent = data.dateLocation.toUpperCase();
-    dateLocation.style.position = 'absolute';
-    dateLocation.style.bottom = '60px';
-    dateLocation.style.right = '340px';
-    dateLocation.style.color = '#ffffff';
+    dateLocation.style.fontStyle = 'italic';
+    dateLocation.style.color = '#93A957';
     dateLocation.style.fontSize = '32px';
     dateLocation.style.fontFamily = 'Arial, sans-serif';
     dateLocation.style.textAlign = 'right';
-    dateLocation.style.zIndex = '2';
-    container.appendChild(dateLocation);
+    dateLocation.style.whiteSpace = 'nowrap';
+    dateLocation.style.flexShrink = '0';
+    raceInfoContainer.appendChild(dateLocation);
+
+    container.appendChild(raceInfoContainer);
 
     try {
       // Wait for images to load

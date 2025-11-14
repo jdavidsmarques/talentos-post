@@ -38,18 +38,18 @@ export const ATHLETES: Athlete[] = [
   },
   {
     id: '8',
-    name: 'Pedro Figueiredo',
-    photo: 'assets/athletes/tania-fernandes.png'
+    name: 'Amilcar Ramos',
+    photo: 'assets/athletes/amilcar-ramos.png'
   },
   {
     id: '9',
-    name: 'Pedro Figueiredo',
-    photo: 'assets/athletes/tania-fernandes.png'
+    name: 'Fred Gaspar',
+    photo: 'assets/athletes/fred-gaspar.png'
   },
   {
     id: '10',
-    name: 'Pedro Figueiredo',
-    photo: 'assets/athletes/tania-fernandes.png'
+    name: 'David Marques',
+    photo: 'assets/athletes/david-marques.png'
   },
   {
     id: '11',

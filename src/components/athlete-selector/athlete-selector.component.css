@@ -41,14 +41,37 @@
 
 .athletes-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-height: 295px; /* Show exactly 2 rows with 5 columns */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Custom scrollbar styling */
+.athletes-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.athletes-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.athletes-grid::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.athletes-grid::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .athlete-card {
   border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 6px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s;
@@ -57,14 +80,12 @@
 
 .athlete-card:hover:not(.disabled) {
   border-color: #0a1a2e;
-  transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .athlete-card.selected {
   border-color: #0a1a2e;
   background: #e3f2fd;
-  transform: scale(1.05);
 }
 
 .athlete-card.disabled {
@@ -74,15 +95,16 @@
 
 .athlete-card img {
   width: 100%;
-  height: 150px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 3px;
+  margin-bottom: 6px;
+  object-position: top center;
 }
 
 .athlete-card p {
   margin: 0;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: bold;
   color: #333;
   white-space: nowrap;

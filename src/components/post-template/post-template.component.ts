@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostData } from '../../models/post-data.model';
 
@@ -9,8 +9,18 @@ import { PostData } from '../../models/post-data.model';
   templateUrl: './post-template.component.html',
   styleUrls: ['./post-template.component.css']
 })
-export class PostTemplateComponent {
+export class PostTemplateComponent implements OnInit {
   @Input() data!: PostData;
+
+  ngOnInit(): void {
+    // Ensure Cunia font is loaded
+    if (!document.querySelector('link[href*="cunia"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.cdnfonts.com/css/cunia';
+      document.head.appendChild(link);
+    }
+  }
 
   getGridColumn(index: number): string {
     const count = this.data.athletes.length;
@@ -54,6 +64,11 @@ export class PostTemplateComponent {
     
     const row = Math.floor(index / cols);
     return `${row + 1}`;
+  }
+
+  getDistanceLines(): string[] {
+    if (!this.data?.distance) return [];
+    return this.data.distance.split('\n');
   }
 }
 
