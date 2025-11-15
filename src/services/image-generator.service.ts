@@ -20,6 +20,30 @@ export class ImageGeneratorService {
       await this.waitForImages(element);
       await new Promise(resolve => setTimeout(resolve, 300));
 
+      // Ensure all athlete photos and cards have explicit dimensions before capture
+      const athleteCards = element.querySelectorAll('.athlete-card');
+      athleteCards.forEach((card: any) => {
+        if (card.style) {
+          card.style.width = '220px';
+          card.style.height = '240px';
+        }
+      });
+
+      const athletePhotos = element.querySelectorAll('.athlete-photo');
+      athletePhotos.forEach((photo: any) => {
+        if (photo.style) {
+          photo.style.width = '220px';
+          photo.style.height = '220px';
+          photo.style.objectFit = 'cover';
+          photo.style.objectPosition = 'center top';
+          photo.style.display = 'block';
+          photo.style.flexShrink = '0';
+        }
+      });
+
+      // Wait a bit for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Generate image using html2canvas from the actual preview element
       const canvas = await html2canvas(element, {
         width: 1080,
@@ -30,7 +54,37 @@ export class ImageGeneratorService {
         logging: false,
         backgroundColor: null,
         windowWidth: 1080,
-        windowHeight: 1080
+        windowHeight: 1080,
+        imageTimeout: 15000,
+        onclone: (clonedDoc: Document) => {
+          // Ensure cards and images are square in the cloned document
+          const clonedCards = clonedDoc.querySelectorAll('.athlete-card');
+          clonedCards.forEach((card: any) => {
+            if (card.style) {
+              card.style.width = '220px';
+              card.style.height = '240px';
+            }
+          });
+
+          const clonedPhotos = clonedDoc.querySelectorAll('.athlete-photo');
+          clonedPhotos.forEach((photo: any) => {
+            if (photo.style) {
+              photo.style.width = '220px';
+              photo.style.height = '220px';
+              photo.style.objectFit = 'cover';
+              photo.style.objectPosition = 'center top';
+              photo.style.display = 'block';
+              photo.style.flexShrink = '0';
+              // Force the image to maintain aspect ratio
+              if (photo.complete && photo.naturalWidth && photo.naturalHeight) {
+                const aspectRatio = photo.naturalWidth / photo.naturalHeight;
+                // Ensure square by setting both dimensions explicitly
+                photo.style.width = '220px';
+                photo.style.height = '220px';
+              }
+            }
+          });
+        }
       });
 
       return canvas.toDataURL('image/png');
@@ -82,24 +136,22 @@ export class ImageGeneratorService {
       const card = document.createElement('div');
       card.style.display = 'flex';
       card.style.flexDirection = 'column';
-      card.style.background = '#0a1a2e';
-      card.style.border = '2px solid rgba(255, 255, 255, 0.2)';
-      card.style.borderRadius = '8px';
+      card.style.backgroundColor = '#FFF';
       card.style.overflow = 'hidden';
       card.style.width = '220px';
       card.style.height = '240px';
       card.style.position = 'relative';
       
-      // Add gradient overlay
+      // Add gradient overlay (using ::before pseudo-element equivalent)
       const gradientOverlay = document.createElement('div');
       gradientOverlay.style.position = 'absolute';
-      gradientOverlay.style.top = '0';
+      gradientOverlay.style.top = '40px';
       gradientOverlay.style.left = '0';
       gradientOverlay.style.width = '100%';
-      gradientOverlay.style.height = '100%';
+      gradientOverlay.style.height = 'calc(100% - 60px)';
       gradientOverlay.style.background = 'linear-gradient(to bottom, #325052 0%, transparent 100%)';
       gradientOverlay.style.pointerEvents = 'none';
-      gradientOverlay.style.zIndex = '1';
+      gradientOverlay.style.zIndex = '-1';
       card.appendChild(gradientOverlay);
 
       // Special handling for 5 athletes: center the 2 athletes in the second row
@@ -118,26 +170,31 @@ export class ImageGeneratorService {
 
       const photo = document.createElement('img');
       photo.src = athlete.photo;
-      photo.style.width = '100%';
-      photo.style.height = '180px';
+      photo.style.width = '220px';
+      photo.style.height = '220px';
       photo.style.objectFit = 'cover';
+      photo.style.objectPosition = 'center top';
       photo.style.position = 'relative';
       photo.style.zIndex = '0';
-      photo.style.maskImage = 'linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%)';
-      photo.style.webkitMaskImage = 'linear-gradient(to top, transparent 0%, rgba(0,0,0,1) 30%)';
+      photo.style.display = 'block';
+      photo.style.maskImage = 'linear-gradient(to top, transparent 0%, rgba(1,33,72,1) 20%)';
+      photo.style.webkitMaskImage = 'linear-gradient(to top, transparent 0%, rgba(1,33,72,1) 20%)';
       card.insertBefore(photo, gradientOverlay);
 
       const name = document.createElement('p');
       name.textContent = athlete.name;
       name.style.margin = '0';
-      name.style.padding = '10px';
+      name.style.padding = '5px';
       name.style.color = '#ffffff';
+      name.style.backgroundColor = '#012148';
       name.style.fontSize = '18px';
-      name.style.fontWeight = 'bold';
+      name.style.fontWeight = '600';
       name.style.textAlign = 'center';
       name.style.fontFamily = 'Cunia, Arial, sans-serif';
+      name.style.fontStyle = 'italic';
       name.style.position = 'relative';
       name.style.zIndex = '2';
+      name.style.lineHeight = '1';
       card.appendChild(name);
 
       grid.appendChild(card);
@@ -152,10 +209,11 @@ export class ImageGeneratorService {
     raceInfoContainer.style.left = '60px';
     raceInfoContainer.style.right = '60px';
     raceInfoContainer.style.display = 'flex';
-    raceInfoContainer.style.alignItems = 'flex-end';
-    raceInfoContainer.style.justifyContent = 'space-between';
+    raceInfoContainer.style.alignItems = 'center';
+    raceInfoContainer.style.justifyContent = 'flex-start';
     raceInfoContainer.style.gap = '30px';
     raceInfoContainer.style.zIndex = '2';
+    raceInfoContainer.style.flexDirection = 'row';
 
     // Add distance with support for two lines
     const distance = document.createElement('div');
@@ -165,7 +223,7 @@ export class ImageGeneratorService {
     distance.style.fontStyle = 'italic';
     distance.style.whiteSpace = 'pre-line';
     distance.style.flexShrink = '0';
-    distance.style.lineHeight = '1.2';
+    distance.style.lineHeight = '0.8';
     
     const distanceLines = data.distance.split('\n');
     if (distanceLines.length === 1) {
@@ -192,22 +250,28 @@ export class ImageGeneratorService {
     
     raceInfoContainer.appendChild(distance);
 
+    // Create race-info-text container
+    const raceInfoText = document.createElement('div');
+    raceInfoText.style.display = 'flex';
+    raceInfoText.style.flexDirection = 'column';
+    raceInfoText.style.gap = '10px';
+    raceInfoText.style.flex = '1';
+    raceInfoText.style.minWidth = '0';
+
     // Add race name
     const raceName = document.createElement('div');
     raceName.textContent = data.raceName.toUpperCase();
     raceName.style.color = '#EEFC5E';
-    raceName.style.fontSize = '50px';
+    raceName.style.fontSize = '70px';
     raceName.style.fontWeight = 'bold';
     raceName.style.fontFamily = 'Arial, sans-serif';
     raceName.style.whiteSpace = 'pre-line';
-    raceName.style.lineHeight = '1.2';
+    raceName.style.lineHeight = '1';
     raceName.style.wordWrap = 'break-word';
     raceName.style.textAlign = 'left';
     raceName.style.fontStyle = 'italic';
-    raceName.style.flex = '1';
-    raceName.style.minWidth = '0';
     raceName.style.maxWidth = '700px';
-    raceInfoContainer.appendChild(raceName);
+    raceInfoText.appendChild(raceName);
 
     // Add date location
     const dateLocation = document.createElement('div');
@@ -216,10 +280,11 @@ export class ImageGeneratorService {
     dateLocation.style.color = '#93A957';
     dateLocation.style.fontSize = '32px';
     dateLocation.style.fontFamily = 'Arial, sans-serif';
-    dateLocation.style.textAlign = 'right';
+    dateLocation.style.textAlign = 'left';
     dateLocation.style.whiteSpace = 'nowrap';
-    dateLocation.style.flexShrink = '0';
-    raceInfoContainer.appendChild(dateLocation);
+    raceInfoText.appendChild(dateLocation);
+
+    raceInfoContainer.appendChild(raceInfoText);
 
     container.appendChild(raceInfoContainer);
 
@@ -234,8 +299,12 @@ export class ImageGeneratorService {
         height: 1080,
         scale: 1,
         useCORS: true,
+        allowTaint: true,
         logging: false,
-        backgroundColor: null
+        backgroundColor: null,
+        windowWidth: 1080,
+        windowHeight: 1080,
+        imageTimeout: 15000
       });
 
       // Cleanup
